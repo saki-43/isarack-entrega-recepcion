@@ -727,9 +727,13 @@ function precargarDesdeURL(){
   if(!p.toString())return false;
   let cambios=[];
   
-  // Pedido
-  const pedido=p.get('pedido');
-  if(pedido){document.getElementById('pedido').value=pedido;cambios.push('pedido');}
+  // Pedido — puede llegar pelón ("7267"); lo normalizamos a folio "S07267"
+  let pedido=p.get('pedido');
+  if(pedido){
+    const _t=pedido.toString().trim();
+    pedido = /^\d+$/.test(_t) ? ('S'+_t.padStart(5,'0')) : _t.toUpperCase();
+    document.getElementById('pedido').value=pedido;cambios.push('pedido');
+  }
   
   // Fecha
   const fecha=p.get('fecha');
@@ -1091,20 +1095,31 @@ async function subirASeguimientos(blob,fname){
   try{
     const sb=getSB();
     if(!sb){throw new Error('No se pudo conectar a Supabase');}
-    // 1) Subir archivo a Storage
-    const {error:upErr}=await sb.storage.from('planos').upload(`${pedido}/entregas/${fname}`,blob,{contentType:'application/pdf',upsert:true});
+    // 0) Resolver el pedido REAL en la base. Puede llegar "7267", "s07267" o con espacios;
+    //    en orders vive como "S07267". Probamos varias formas y usamos la que exista.
+    const _raw=(pedido||'').toString().trim().toUpperCase();
+    const _dig=_raw.replace(/\D/g,'');
+    const _cands=[...new Set([_raw, _dig?('S'+_dig.padStart(5,'0')):'', _dig?('S'+_dig):'', _dig].filter(Boolean))];
+    const {data:_matches,error:_mErr}=await sb.from('orders').select('num,payload').in('num',_cands);
+    if(_mErr)throw _mErr;
+    if(!_matches||!_matches.length){
+      st.style.background='#FEE2E2';st.style.color='#991B1B';
+      st.innerHTML='⚠ El pedido "'+pedido+'" no existe en el sistema.<br>Revisa el número, o confírmalo primero si aún es cotización. El PDF sí lo puedes Descargar o mandar por WhatsApp.';
+      return;
+    }
+    const _canon=_dig?('S'+_dig.padStart(5,'0')):_raw;
+    const order=_matches.find(o=>o.num===_canon)||_matches.find(o=>o.num===_raw)||_matches[0];
+    const numReal=order.num;   // folio real, ya validado contra la base
+    // 1) Subir archivo a Storage (con el folio real)
+    const {error:upErr}=await sb.storage.from('planos').upload(`${numReal}/entregas/${fname}`,blob,{contentType:'application/pdf',upsert:true});
     if(upErr)throw upErr;
     // 2) Obtener URL pública
-    const {data:urlData}=sb.storage.from('planos').getPublicUrl(`${pedido}/entregas/${fname}`);
+    const {data:urlData}=sb.storage.from('planos').getPublicUrl(`${numReal}/entregas/${fname}`);
     const pdfUrl=urlData.publicUrl;
-    // 3) Leer pedido actual JUSTO ANTES del update (merge anti-pérdida).
-    // Esto minimiza la ventana donde otro dispositivo pudiera tener cambios no vistos.
-    const {data:order,error:rdErr}=await sb.from('orders').select('payload').eq('num',pedido).single();
-    if(rdErr)throw rdErr;
     // 4) Agregar a pdfsRecepcion (con dedupe por storagePath para no acumular duplicados)
     const payload=(order&&order.payload)?((typeof order.payload==='string')?JSON.parse(order.payload):order.payload):{};
     payload.pdfsRecepcion=payload.pdfsRecepcion||[];
-    const newPath=`${pedido}/entregas/${fname}`;
+    const newPath=`${numReal}/entregas/${fname}`;
     // Quitar cualquier entrada previa con el mismo storagePath (no debería haber, porque
     // el filename incluye timestamp único, pero como red de seguridad)
     payload.pdfsRecepcion=payload.pdfsRecepcion.filter(e=>(e&&e.storagePath)!==newPath);
@@ -1119,12 +1134,12 @@ async function subirASeguimientos(blob,fname){
       supervisor:gv('supervisor')||'',
       ejecutivo:gv('ejecutivo')||''
     });
-    // 5) Actualizar pedido
-    const {error:upPedErr}=await sb.from('orders').update({payload,updated_at:new Date().toISOString()}).eq('num',pedido);
+    // 5) Actualizar pedido (con el folio real)
+    const {error:upPedErr}=await sb.from('orders').update({payload,updated_at:new Date().toISOString()}).eq('num',numReal);
     if(upPedErr)throw upPedErr;
     st.style.background='#D1FAE5';
     st.style.color='#065F46';
-    st.innerHTML=`✓ PDF guardado en Seguimientos del pedido ${pedido}`;
+    st.innerHTML=`✓ PDF guardado en Seguimientos del pedido ${numReal}`;
     // Si la PWA de instaladores nos mandó, regresar al pedido
     try{
       const _volver=new URLSearchParams(location.search).get('volver');
