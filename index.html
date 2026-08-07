@@ -754,21 +754,38 @@ function precargarDesdeURL(){
     }
   }
   
-  // Tipo de servicio (entrega vs instalación)
+  // Tipo de servicio (entrega vs instalación). El rol MANDA sobre el tipo.
   const rol=(p.get('rol')||'').toLowerCase();
   let tipoServicio=p.get('tipo');
-  if(rol==='chofer')tipoServicio='entrega';else if(rol.indexOf('instal')===0)tipoServicio='instalacion';
+  if(rol==='chofer')tipoServicio='entrega';
+  else if(rol.indexOf('instal')===0)tipoServicio='instalacion';
   if(tipoServicio==='instalacion'){
+    document.getElementById('ts_ent').checked=false;
     document.getElementById('ts_ins').checked=true;
-    // Disparar el change event para que actualice las secciones
     document.getElementById('ts_ins').dispatchEvent(new Event('change'));
+    window._modoForzado='instalacion';
     cambios.push('servicio');
   }else if(tipoServicio==='entrega'){
+    document.getElementById('ts_ins').checked=false;
     document.getElementById('ts_ent').checked=true;
     document.getElementById('ts_ent').dispatchEvent(new Event('change'));
+    window._modoForzado='entrega';
     cambios.push('servicio');
   }
-  if(rol||p.get('lock')){const _tg=document.querySelector('.srv-toggle');if(_tg)_tg.style.display='none';const _hint=document.querySelector('.srv-hint');if(_hint)_hint.style.display='none';}
+  // Si vino con rol → bloquear toggle y mostrar badge grande con el modo activo
+  if(rol||p.get('lock')){
+    const _tg=document.querySelector('.srv-toggle');if(_tg)_tg.style.display='none';
+    const _hint=document.querySelector('.srv-hint');if(_hint)_hint.style.display='none';
+    const _cont=document.querySelector('.srv-toggle')?.parentElement;
+    if(_cont&&!document.getElementById('modo-badge')){
+      const _b=document.createElement('div');
+      _b.id='modo-badge';
+      const esI=window._modoForzado==='instalacion';
+      _b.style.cssText='background:'+(esI?'#1a1a1a':'#E8571A')+';color:#fff;padding:12px 16px;border-radius:8px;font-weight:800;font-size:16px;text-align:center;letter-spacing:1px;box-shadow:0 2px 8px rgba(0,0,0,.15);font-family:Barlow,sans-serif';
+      _b.innerHTML=(esI?'🔧 ENTREGA DE PROYECTO (INSTALACIÓN)':'📦 SOLO ENTREGA')+'<div style="font-size:11px;font-weight:500;opacity:.9;margin-top:3px;letter-spacing:.5px">Modo asignado según el rol del pedido</div>';
+      _cont.appendChild(_b);
+    }
+  }
   
   // Supervisor (instalador)
   const instalador=p.get('instalador');
@@ -850,7 +867,12 @@ window.addEventListener('load',()=>{
 
 const gv=id=>(document.getElementById(id)?.value||'').trim();
 const fmtF=s=>{if(!s)return'';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;};
-const esIns=()=>document.querySelector('input[name="srv"]:checked')?.value==='instalacion';
+// Si la URL trajo rol/tipo, ese es la fuente de verdad. Solo cae al radio si no vino nada forzado.
+const esIns=()=>{
+  if(window._modoForzado==='instalacion')return true;
+  if(window._modoForzado==='entrega')return false;
+  return document.querySelector('input[name="srv"]:checked')?.value==='instalacion';
+};
 
 // GENERAR PDF
 function generarPDF(){
