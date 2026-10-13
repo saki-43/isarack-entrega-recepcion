@@ -1175,13 +1175,13 @@ async function subirASeguimientos(blob,fname){
     // 4b) 13 oct 2026 (Isaac): al Guardar se da por TERMINADO (ya no hay paso 4
     //     "Marcar entregado" en la app de instaladores: se salían sin darlo).
     //     Solo si viene de la app de instaladores y ya tiene sus fotos, igual que
-    //     pedía ese paso: chofer >= 1 foto de entrega; instalador >= 2 de terminación.
+    //     pedía ese paso: chofer >= 2 fotos de entrega; instalador >= 2 de terminación.
     let _cerrado=false;
     try{
       const _q=new URLSearchParams(location.search);
       const _rol=(_q.get('rol')||'').toLowerCase();
       const _deApp=!!_urlVolver();
-      const _fotosOk=(_rol==='chofer')?((payload.fotosEntrega||[]).length>=1):((payload.fotosTerminacion||[]).length>=2);
+      const _fotosOk=(_rol==='chofer')?((payload.fotosEntrega||[]).length>=2):((payload.fotosTerminacion||[]).length>=2);
       if(_deApp&&_fotosOk&&payload.estatus!=='Completado'&&payload.estatus!=='Cancelado'){
         payload.estatus='Completado';payload.entregado='Si';payload.armado='Listo';payload.instalacion='Listo';
         payload.fechaEntregado=new Date().toISOString();payload.updated=Date.now();
