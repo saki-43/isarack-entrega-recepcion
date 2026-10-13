@@ -202,6 +202,7 @@ body{font-family:'Barlow',sans-serif;background:#EFEFED;color:var(--dk);min-heig
 <button onclick="actualizarApp()" title="Forzar ultima version" style="position:fixed;right:12px;bottom:12px;z-index:99999;background:#E8571A;color:#fff;border:none;border-radius:22px;padding:9px 15px;font-size:12px;font-weight:700;font-family:'Barlow',sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.25);cursor:pointer">&#10227; Actualizar</button>
 
 <header class="hdr">
+  <button id="btn-regresar" onclick="regresarApp()" style="background:#f1efe8;border:none;color:#333;font-size:15px;font-weight:700;padding:10px 12px;border-radius:9px;cursor:pointer;margin-right:8px;font-family:'Barlow Condensed',sans-serif;flex-shrink:0">← Regresar</button>
   <div style="display:flex;align-items:center;gap:14px;">
     <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEiAYUDASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAEIBgcCBAUDCf/EAEkQAAIBAwIDBQMGCgYKAwAAAAABAgMEEQUGByExEkFRYXEigbITFDI3QnIIIzNidHWRobPBNDU2c7HwFVJVY2RlgqKj0SQmVP/EABsBAQACAwEBAAAAAAAAAAAAAAABBgIEBQcD/8QAMBEBAAEEAQIEBAYBBQAAAAAAAAECAwQRBQYSISJBURMxMjMjNGFxgcGRFKGx0fD/2gAMAwEAAhEDEQA/ALlgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMgAMojKGxIGUR2o8vaXPpz6gSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3g+datSo0nUqzjCK6uTwkRMxHzTEbnUPo2l3nQ1fVLLS7Spd31zSoUYLLnOSS/ea/3zxX07TXUtNCUNRuU8OrGWKUPf9p+hprXdc1XXrt3Or3MrmWfYhLlCn92K5HFzubs48TTT4ysfF9NZGZPdc8tP6/NsjePF6rWlK025bJU3yd1XjzfnGP8A7/Z3mScENT1HVdCvLnUrytdVfncsSm+nsR5JdEvI0Gkl05G8/wAHtf8A1a8/TJfBE5nFZ93Jy4758HZ5zi8XB4+YtU+O48fVl/EO8uLHYGvXlrUlTr0dOrzpzi2nGSg8NNd6K07A40bp21WjQ1OrV13T1hSp3M81orH2aj5+6WV6Fj+Kn1Z7kf8Ayy4/hspM/It+vRQIXV4fcQNs70te1pN9GN1FfjLOtiFaHi+znmvNZRliaaTTTT6FAba4r2tzTuratUo16Uu1Tq05NThLxT6r06G6OGvHfUbCrTsd4UZX9t0V5RWK0F4zi3ia81iXk+9pksuDzNt6/o+4tOhf6NqFC8oS76cucfKUXzi/Jo9PKIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABGUO0vECckOSXVpHi7n3NpG3bf5XUrunTbWY08+3P0XVml978UNU1j5S20uEtOtXL6cZfjZrwbX0f8810Odl8nYxfCqfH2dXj+Hyc6ryRqPf0bQ3vxA0bbinRdVXl4liNtRack8faecRXrz8maU3jvbXNzSlC5rfNrZvKtaL9n1b+0Y12223LLbeW31bJyVPN5a9fmYjwh6BxnT+NheaY7qveXBoEsg5Pzncu/PiG9fwef7KXn6ZL4Ymije34PP9lbxf8ZL4Yna4L83Cr9V/kf5hk/Ff6sty/qyv8DKRroXc4r/VluX9WV/gZSRdC9w8xSuhJC6Ekjv7d17WduanHUdF1CtZXMWvap4w14STWJLylnr3FguHfHrTL6FKx3dGlpt1L2Vd04v5Cb/OXNwb8eaz3lbmk0cezz5PBAv9a16Nzb069CrCrSqRUoThJSUk+9NdT6vkUn2Dv/c+ybntaReuraSlmpZ3Lc6EvHC6xfnHHv6FkuHXFzbe74ws61WOl6o0k7W4kkqj/wB3LpJeXJ+RGmTYwIjyJIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIyumScmOb43NY7X0mrqF1Lt1Ir8VRTXaqS8F/PyPnduU2qJrq+UM7dqu7XFFEbmXsX99Z2NvK4u7ilQox6znJJI1JvPi9HtVLPbNLtdV88qrln82Pf6vl5M1xurc+s7lvZ19SrtQeUreEn8nDyXieLCKilFLCSwVHP52u5PbZ8IX/jOlLVqYryvGfb0dnUb681G8ld31zVuK83mU6kstv+XouR8eqI7yVg4Fdyq5VuqVxotUW6e2mNQjoSQyOZiySCAEbSb1/B4/sxefpj+CJopG9PweP7MXn6ZL4Ina4L81H7Kx1X+Rn94ZTxY+rLcv6rr/AAMpIvol2uLTxwx3K/8Allf4GUmksPBeoh5jIuhJC6EmSAAAMnB57WfecyMAbP4b8adybanTstXlU1rTF7PZqz/HUl3diffjwfLHLK7rGbH3vt7d9pK50a/hOVOKdWhUXYq0m/8AWj3evTzKSJczs2F5eadf0tQ068r2l7Rl2qVelNxnDyXk+9d/RpohMzpfhNMk1RwL4oR3jQejaz8lS123h2nKCUYXMF9uK7peKXqklyNrroYkAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHCUsJvBXTjTrEtW3vXtlJ/NrCMaMF3SlhOT/fj3MsZJcmVS3lUlPd2rt8/wD5tVfsm0V/qC7NNiKI9ZWvpGxTXlVV1ekPJSwsdQSQUv5PSgYAJ+YAAAHyDaSy2uuD3dqbT1zc1eMNMtnCl2vbuqqcaUV5Nc5PyXvPpas13Z1RG3wyMq1jUTXdq1Dwmmkm8peOOpYDgTpt9p+1Zzvbedv85ryq04TTUuxhJNruzjJ2Nl8NtH0DFxXSvr3Kl8rUprswl4xj0T8+pnEI9lJJci3cTxVWNPxLk+MvPuf6hoz6PgWY8sevq8zemlz1zaOr6PTl2J3tnVoRfg5RaXuyyj+saff6TqVTTtUtKtneUfZnRqxakseGeq8H3rDL79x4O8to6Bu3T5Wet6fTuOWKdVezVpPxjLqv89SwxOoVFR2LWOpJtfiNwQ13QJzvdvyq61pyeZQxi4pLzX215x5/mmp8+3KPZlFxk4yjLk4vwa7n68/QkH1AfUGSAAAACAPS2rrVzt3cun63aZVa0rxqYX249HD3pte8vVY3NK8sqN3Ql2qVanGpCXjFrKZQGTfMvFwynOrw727ObzJ6bQy/+hGMsmRAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcanKD9Cpm5ZupuTVJvHtXlZ8vvstlX/Iy9GVK1tp65qLXT53W+NlY6i+mldOjafxbk/pDpAl9SCpvQQACfADuaPpeo6xdfNtMs6l1Wz2XGHSPnKXRe861Cm61xSoqTi51Ixyu7LSyWo2rolhomlUbSwto0Ywik/Z5vzbOrxfGzmzuZ8IV/neanjaYiiN1S19s3hHZW3yd5uBq7r9XQjypxfm+svTp5G0LShStaMaNCnGFOCxGMVhJeCR2EsodkuuPiWseNW4082zM6/l1992rblHmuaAJRsNNC6ksNEcyUDTwYHxE4W7Y3lGVxXt/mGpJeze20UpP78ek/8fMz3uGBtKmPEDhpufZkqla+tvnVgn7F5QTcMd3a/wBV+v7zCoyyk000/A/QCtThVpyp1IRnCSxKMllNeDRTTjZoVjt7ibqmnadTjRtX2K8KUekO3FNryWW8GUShhgD6glAAAOEi8HC76t9ufq2h8CKPy6F4OF31b7c/VtD4EYyyZIACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwrfkp/dZUbU/wCtb79Kq/Gy3VX6D9Como/1pe/pNT4mVjqL6aP5XXo37l39o/t8H1IJfUgqb0AAAH30/lqFt/fQ+JFu6WHTj91FQrP+m2/99D4kW8ofkofdRa+mp8lcf+9VA60+u1/P9PpgglkPqWeFISgQiSUgAAAAAVD/AAlPri1N/wDD2/8ADRbwqH+Eqs8X9T/urf8AhIDXXcAlhAzhAAAhxkXf4YfVvtz9W0PgRR+q+zCTXci8XDJY4cbcx/su3f8A44mMsmRLoAugIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHCp9F+hUbU/6zvf0mp8bLc1foSfkyo2q8tVvl4XVVf97Kx1F9NK69G/cu/tH9usACpvQAAAfWy/p1v/AH0PiRbyh+Th91FQ7L+n2y8a0F/3It5Q/JQ+6i19OT4VqB1p9dr+f6c2GSR0LPCkpSAQJAAAAAAKh/hKfXBqf91b/wAJFvCof4SLT4w6qsrKpUP4MP8A2BrruA7gZwgAAQ+dbnTkl4F4+Gf1c7cx/su2/hxKPSLv8L/q325+raHwIxlkyRdAF0BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4VPov0ZUfWf661HH/wCur8bLb1eUJfdZUnXF2db1FPli7q/GytdRx5KF16N+5c/aP7dRdAF0BUXoAAAPtYtLUbNt4Xzmll/9aLb28k6UGmmsFQ1382n3Ndz8TZ2xuK1fT4wsdwUZ3FvHEY3VPnOP3o9681z8u87/AAedaszVTXOtqh1Txt7LpouWo327/pvVEnnaHrGn6vY07qxu6NanNNrszT/d3ejO/wBpPo8lxoriqImJedV0VW6u2qNS5IEJkmaAAACO0s9Sco87WdU0/SrSpeX93SoUYdZTkl/n0Ma66aI3VKaaZqqimmNy9HK8TSnH3hZqG6NQW5dtzpTv40o0rmzqPsK4jHOHGXTt88c+WF3c85DDjDteeoK1nTvqVFy7PzmVH2F59c488Ge6bfWd9Z07q1uqNelUWYzhNNNep8bOVavfRU2L+HkY+vi0TG1EdTtbrTb+pYX9rWs7mm+zKjXj2Zxfp/lYPhku7vjZe3N46f8ANdc0+FaUY4pV4Ps1qXnGfVenTyK3cRuDW4dsfKX2lKprWlxy5Spw/H0l+dBfSx4o2olqtaAiCbi2sSS6tEkocJdC8HC76t9ufq2h8CKPz6F4OF31b7c/VlD+GjGWTJAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOFXHYlnwKmbmi4bk1WPhe1vjZbOosxa8Vgq3xFsp2G9tWt55y67rLKxyn7X7OePcVzqGn8KmpcOjq4/1FdPvDwV0Aj0BT3ooAAAAA7+h6xqWiXiutMu6ltUz7XZb7M/vR6S9/Pwx1NvbK4sWd5UpWOvU42NaXJXMW3Rl5vPOPo+XmaSB0MXlL2Lrt+Tk8hwuPnx5483v6reWtxSr0o1KNaFWEualF5TOwmVb2rvHXNuSirGuqtun/R6rbp+fnHx5G7NncRdF16FOjVqRsbxrEqVaa5v8195bMLmLORHm8Jefcl0/k4UzqO6n3ZxleJwrVadOlKc5xjGK5tvkjDt48QdC2/CUY3EL67xiNvQkpPP5zziK9efkzS28d767uSpJV7l21o+lpRliHq31k/XHiMvmLOPGvnLHjeAys6d67afeWzd7cV9P0/5Sy0TsX9ysqVVcqUH5P7T8unmjTmv6zqev3qvNUvatxUj9CLeIwXgorkv3+p5vuwSiqZvI3sqfGdR7PQeO4LFwo1Ebn3HHJ7G19yaxtyup6Vc9iGcyozf4uXquifmuZ5DYeMGjRertTuidOlkY9u/b+HcjcLB7F4k6Rr1Ola3nZ07UHydKpL2ZvPWMv5Pn/iZ2nB5WVy8GU+nHMOzjKznBm2yeJOuaHKla305ahYR9lKo26lOPhGXh5MtHH87qO2//lReU6UmN3MSfD2/6bD4lcH9tbs7eoWcP9Fau+fzi3iuxVf+8hyTf5yw/XoVw3zsjcWzb6VvrNi3Qb/E3tFOVCp78cn5PmW62ruzQ9xWca2n3cflPt0Zvs1IPzj1PYvLS2vbSraXtvTuLerHszpVYqUZLwwyzW71NyIqpncKdds12p7a41Kg1R+xLHN4LxcMUo8Odtpc09Ltn/4omp+IH4PltfVpXez76lpzm32rW4TlSivzGua8k8+43PtfTpaRtvTNKlNTdnaUqDkl17EFH+RnL5vTABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiSyjV3G3aFTVqFHWtOoynd20XGvCCy6lJc8475LnjxyzaR86tNTi4vozWysajJtzRVDawsuvEvU3aPnCnyTS5rxGTfm+uF+maz8re6a1Y30val2YZp1X4yj4+a6eZpnce3tW0C6+Q1O0qUcvswnntQn6S/lyZRczjb2LPmjweocXzuPnxqJ1V7PJAxhtPqDnu0AAJAAAZCisokldSYnSJiJ+aHhN4IXUmXUhdRtlEaSOY7wYo2eYAGgAHdkTPoPpa3Fe0uIXVrXqUK1N5jUhLsyXv8PI2tsbizXVW30zcFP5XtyVOF1COHFvopr+aNbaBoeq6/eK00qynXmn+MqdIU15vHI3NsThXp+jXFLUdVk7+9WJRg/yNNp8ml3vzZ3uIoy+6Jt+FP6qp1Bf474cxdjdfpr57bMpvME/FZORxhyjg5F1jfq81AASAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYOjq2n2ep2s7W+tqdejNYlGccpneIaIqpiqNTCaappndM6lpfevCOrFzu9tTUo9Xa1JfRWPsS/k/2o1Pd2t5Z3k7O7tqtC5g8Spzg4yXu/z7y4GDwt1bV0bctpKhqlpGpLGIVUsTh92Xd/gV/O4Si7uq14StfGdU3rGqL/AJqff1VYw8c0SZ9vThnrOi1KlxptOpqdkunYWKsF5pfS9xgbi1KUebcXh8sYfgVXIxL2PVq5C+4mfYzKe+zVv/lwBL6g1ttxAAJAAAAAAC59PQlc5KK5yfRLqzOtlcM9c1ypG41CM9MsZJpOcPxs15J9F6+uO82MfFuZFXbRDTzM+xh0d92phNpbXF3cwtrW3qV603iNOEW5P9htPZHCSrXUbzc1RQg+lrSlzlH86Xd6L9vcbM2vtHRduWaoaZaRpywu3WfOpN+LZ72MotOHwlFuIqvRuVC5Lqq9f3Rj+WP93T0rTLLS7KnZ2FCNC3pLEKcFhI7sea5jBODvUURTGoVSuqquruqnaVjAIXUk+iAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfOcVJNYfPqYZvbh5o24nK6hR+aXzXKtSWM+q6P/AB8zNxg+V2zbu09tcbfbGyLuNX326tSq9u/ZmubZqyd5bura59i5pJuD+9/qmOw9uLlHml1a6It9cUadenKnWhGcJLDi1lM1jvnhPYajOpfaC42F21n5JrNGXj5x93LyKtncDMVd9j/C78b1bEx8PKjx92jn1IPR13RdV0O8laarZ1LeonhNr2J/dl0a9P3HnJ56FduW6rdXbXGpXS1dou0xVRO4kBHaiurR6GiaPqetXattNs6txNvDcY+zHzlLoveLduq5OqYLt63Zp7rk6h58mkst4WcZ8zIdobO13c1xH5hbdi1T9u5q+zBenfJ+nI2fsrhNZWbp3W4Kivq65qisqlB+n2vf+w2bbW9O2pxpUIRpwisKMUkkix4PAzM919TeU6spp3bxPH9ZYZsvhxougNXFWCvL3r8tWin2furov8TOYrCCXIlIs1ixRZjtojUKNk5N7Jr7rs7lKQJ7gfZ8NI7iSGO4lKUAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB0dU02y1K3nb31rSuKU1iUakcpmB6jwf2vc1pVaFW+s89IUquYL0UkzZLRGDXv4lm/9ynbasZ2Tj/armGttO4PbYt6/ytxWv7vnnsTq9mP7IpZ/aZ1pWk6dplrC3sLSlb0odIwikd/BOCLWHYs/RTpN/Pycj7tcyhLkShgk2WnowAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/9k=" style="height:70px;width:auto;flex-shrink:0;" alt="ISARACK">
     <div style="display:flex;flex-direction:column;line-height:1;">
@@ -210,7 +211,7 @@ body{font-family:'Barlow',sans-serif;background:#EFEFED;color:var(--dk);min-heig
     </div>
   </div>
   <button class="btn-ver" id="btn-ver-pedido" onclick="verPDFPedido()" style="display:none">📄 Ver pedido</button>
-  <button class="btn-gen" onclick="generarPDF()">📄 Generar PDF</button>
+  <button class="btn-gen" onclick="guardarFormulario()">💾 Guardar</button>
 </header>
 
 <div class="main">
@@ -414,13 +415,13 @@ body{font-family:'Barlow',sans-serif;background:#EFEFED;color:var(--dk);min-heig
 <div class="mbg" id="modal">
   <div class="modal">
     <div class="ico">✅</div>
-    <h2>&iexcl;PDF Listo!</h2>
-    <p id="modal-msg">Tu formulario est&aacute; generado y listo para compartir.</p>
+    <h2>&iexcl;Guardado!</h2>
+    <p id="modal-msg">La entrega qued&oacute; guardada. Env&iacute;ala por WhatsApp o toca <b>Terminar</b>.</p>
     <div id="sync-status" style="margin:10px 0;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600;display:none;"></div>
     <div class="mbtns">
+      <button class="bwsp" id="btn-wsp">&#128242; Enviar por WhatsApp</button>
       <button class="bdl" id="btn-dl">&#11015;&#65039; Descargar PDF</button>
-      <button class="bwsp" id="btn-wsp">&#128172; Compartir por WhatsApp</button>
-      <button class="bcer" onclick="document.getElementById('modal').classList.remove('show')">Cerrar</button>
+      <button class="bcer" id="btn-terminar" onclick="terminarYRegresar()" style="background:#1A1A1A;color:#fff;font-weight:700;font-size:15px">&#10003; Terminar</button>
     </div>
   </div>
 </div>
@@ -853,6 +854,40 @@ const fmtF=s=>{if(!s)return'';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
 const esIns=()=>document.querySelector('input[name="srv"]:checked')?.value==='instalacion';
 
 // GENERAR PDF
+// ── 13 oct 2026 (Isaac): más intuitivo para el instalador ──
+// · "Guardar" en vez de "Generar PDF": pide el número de pedido antes.
+// · Al Enviar por WhatsApp o Terminar, regresa a la app de instaladores con
+//   &firmado=1 y allá el pedido se da por terminado solo (si ya tiene sus fotos).
+// · Botón "← Regresar" para salir sin quedarse atorado.
+let _subidaPromesa=null, _guardadoOK=false;
+function _urlVolver(){
+  try{const v=new URLSearchParams(location.search).get('volver');if(v&&v.startsWith('https://isarack-instaladores.vercel.app'))return v;}catch(e){}
+  return '';
+}
+function regresarApp(){
+  const v=_urlVolver();
+  if(v){location.href=v;return;}
+  if(history.length>1)history.back();
+  else location.href='https://isarack-instaladores.vercel.app/';
+}
+async function terminarYRegresar(){
+  const b=document.getElementById('btn-terminar');
+  if(_subidaPromesa){if(b){b.disabled=true;b.textContent='⏳ Guardando…';}try{await _subidaPromesa;}catch(e){}}
+  const v=_urlVolver();
+  if(v&&_guardadoOK){location.href=v+(v.indexOf('?')>=0?'&':'?')+'firmado=1';return;}
+  if(v){location.href=v;return;}
+  document.getElementById('modal').classList.remove('show');
+  if(b){b.disabled=false;b.innerHTML='&#10003; Terminar';}
+}
+function guardarFormulario(){
+  const el=document.getElementById('pedido');
+  if(!gv('pedido')){
+    alert('Escribe el número de pedido (por ejemplo S07526) antes de guardar.');
+    if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});el.style.borderColor='#c62828';}
+    return;
+  }
+  generarPDF();
+}
 function generarPDF(){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'pt',format:'letter'});
@@ -1053,10 +1088,12 @@ function generarPDF(){
   document.getElementById('btn-dl').onclick=dl;
   document.getElementById('btn-wsp').onclick=()=>{
     const msg=`📋 *Entrega/Recepción ISA RACK*\nPedido: ${gv('pedido')||'-'}\nFecha: ${fmtF(gv('fecha'))}\nSupervisor: ${gv('supervisor')||'-'}\nTipo: ${esIns()?'Instalación':'Solo Entrega'}`;
-    if(_shareFile({text:msg}))return;
+    const _sh=_shareFile({text:msg});
+    if(_sh){_sh.then(ok=>{if(ok)terminarYRegresar();});return;}
     dl();
     setTimeout(()=>{
       window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(msg+'\n\n_Adjunta el PDF al chat_'),'_blank');
+      setTimeout(()=>terminarYRegresar(),1500);
     },800);
   };
   if(/iPad|iPhone|iPod/.test(navigator.userAgent)&&!_canShareFile){
@@ -1065,7 +1102,8 @@ function generarPDF(){
   }
   document.getElementById('modal').classList.add('show');
   // Subida AUTOMÁTICA a Seguimientos (ISA-OS)
-  subirASeguimientos(blob,fname);
+  _guardadoOK=false;
+  _subidaPromesa=subirASeguimientos(blob,fname);
 }
 
 // SUPABASE - subida automática a ISA-OS
@@ -1134,20 +1172,31 @@ async function subirASeguimientos(blob,fname){
       supervisor:gv('supervisor')||'',
       ejecutivo:gv('ejecutivo')||''
     });
+    // 4b) 13 oct 2026 (Isaac): al Guardar se da por TERMINADO (ya no hay paso 4
+    //     "Marcar entregado" en la app de instaladores: se salían sin darlo).
+    //     Solo si viene de la app de instaladores y ya tiene sus fotos, igual que
+    //     pedía ese paso: chofer >= 1 foto de entrega; instalador >= 2 de terminación.
+    let _cerrado=false;
+    try{
+      const _q=new URLSearchParams(location.search);
+      const _rol=(_q.get('rol')||'').toLowerCase();
+      const _deApp=!!_urlVolver();
+      const _fotosOk=(_rol==='chofer')?((payload.fotosEntrega||[]).length>=1):((payload.fotosTerminacion||[]).length>=2);
+      if(_deApp&&_fotosOk&&payload.estatus!=='Completado'&&payload.estatus!=='Cancelado'){
+        payload.estatus='Completado';payload.entregado='Si';payload.armado='Listo';payload.instalacion='Listo';
+        payload.fechaEntregado=new Date().toISOString();payload.updated=Date.now();
+        _cerrado=true;
+      }
+    }catch(e){}
     // 5) Actualizar pedido (con el folio real)
-    const {error:upPedErr}=await sb.from('orders').update({payload,updated_at:new Date().toISOString()}).eq('num',numReal);
+    const _upd={payload,updated_at:new Date().toISOString()};
+    if(_cerrado)_upd.estatus='Completado';
+    const {error:upPedErr}=await sb.from('orders').update(_upd).eq('num',numReal);
     if(upPedErr)throw upPedErr;
     st.style.background='#D1FAE5';
     st.style.color='#065F46';
-    st.innerHTML=`✓ PDF guardado en Seguimientos del pedido ${numReal}`;
-    // Si la PWA de instaladores nos mandó, regresar al pedido
-    try{
-      const _volver=new URLSearchParams(location.search).get('volver');
-      if(_volver&&_volver.startsWith('https://isarack-instaladores.vercel.app')){
-        st.innerHTML+='<br>↩ Regresando a su pedido…';
-        setTimeout(()=>{location.href=_volver;},1500);
-      }
-    }catch(e){}
+    st.innerHTML=_cerrado?`✓ Guardado — pedido ${numReal} TERMINADO`:`✓ Guardado en el pedido ${numReal}`;
+    _guardadoOK=true;
   }catch(e){
     console.error(e);
     st.style.background='#FEE2E2';
