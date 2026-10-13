@@ -1195,26 +1195,35 @@ async function subirASeguimientos(blob,fname){
     //     "Marcar entregado" en la app de instaladores: se salían sin darlo).
     //     Solo si viene de la app de instaladores y ya tiene sus fotos, igual que
     //     pedía ese paso: chofer >= 2 fotos de entrega; instalador >= 2 de terminación.
-    let _cerrado=false;
+    let _cerrado=false,_soloEntrega=false;
     try{
       const _q=new URLSearchParams(location.search);
       const _rol=(_q.get('rol')||'').toLowerCase();
       const _deApp=!!_urlVolver();
       const _fotosOk=(_rol==='chofer')?((payload.fotosEntrega||[]).length>=2):((payload.fotosTerminacion||[]).length>=2);
+      // Chofer en un pedido que además lleva instalación (instalador asignado aparte o
+      // REPSE distinto de "Solo Entrega"): solo queda ENTREGADO; la instalación sigue
+      // abierta (13 oct 2026, S07216).
+      const _llevaInst=(payload.instaladorCel&&payload.instaladorCel!==payload.choferCel)||(payload.repse&&payload.repse!=='Solo Entrega');
       if(_deApp&&_fotosOk&&payload.estatus!=='Completado'&&payload.estatus!=='Cancelado'){
-        payload.estatus='Completado';payload.entregado='Si';payload.armado='Listo';payload.instalacion='Listo';
-        payload.fechaEntregado=new Date().toISOString();payload.updated=Date.now();
-        _cerrado=true;
+        payload.entregado='Si';payload.fechaEntregado=new Date().toISOString();payload.updated=Date.now();
+        if(_rol==='chofer'&&_llevaInst){
+          if(!payload.estatus||payload.estatus==='Pendiente')payload.estatus='En proceso';
+          _soloEntrega=true;
+        }else{
+          payload.estatus='Completado';payload.armado='Listo';payload.instalacion='Listo';
+          _cerrado=true;
+        }
       }
     }catch(e){}
     // 5) Actualizar pedido (con el folio real)
     const _upd={payload,updated_at:new Date().toISOString()};
-    if(_cerrado)_upd.estatus='Completado';
+    if(_cerrado)_upd.estatus='Completado';else if(_soloEntrega)_upd.estatus=payload.estatus;
     const {error:upPedErr}=await sb.from('orders').update(_upd).eq('num',numReal);
     if(upPedErr)throw upPedErr;
     st.style.background='#D1FAE5';
     st.style.color='#065F46';
-    st.innerHTML=_cerrado?`✓ Guardado — pedido ${numReal} TERMINADO`:`✓ Guardado en el pedido ${numReal}`;
+    st.innerHTML=_cerrado?`✓ Guardado — pedido ${numReal} TERMINADO`:(_soloEntrega?`✓ Guardado — ${numReal} ENTREGADO (falta la instalación)`:`✓ Guardado en el pedido ${numReal}`);
     _guardadoOK=true;
   }catch(e){
     console.error(e);
