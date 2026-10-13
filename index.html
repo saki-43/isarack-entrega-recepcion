@@ -38,6 +38,8 @@
   }
   // Boton "Actualizar": purga TODO y recarga sin cache (URL distinta = miss de cache)
   window.actualizarApp=async function(){
+    // No recargar mientras se guarda: se perdería la firma del cliente.
+    try{if(typeof _subidaPromesa!=='undefined'&&_subidaPromesa&&!_guardadoOK){alert('Espera a que termine de guardar antes de actualizar.');return;}}catch(e){}
     try{await purgar();}catch(e){}
     var base=location.href.split('?')[0].split('#')[0];
     location.replace(base+'?v='+Date.now());
@@ -864,7 +866,25 @@ function _urlVolver(){
   try{const v=new URLSearchParams(location.search).get('volver');if(v&&v.startsWith('https://isarack-instaladores.vercel.app'))return v;}catch(e){}
   return '';
 }
+// Mientras se guarda, los 3 botones quedan bloqueados (Isaac, 13 oct 2026: le daban
+// Terminar antes de que se guardara y se perdía la firma del cliente). Si falla, no
+// deja salir: Terminar se vuelve "Reintentar guardar".
+let _ultimoPdf=null;
+function _botonesModal(estado){
+  const w=document.getElementById('btn-wsp'),d=document.getElementById('btn-dl'),t=document.getElementById('btn-terminar');
+  const set=(b,on)=>{if(!b)return;b.disabled=!on;b.style.opacity=on?'':'.45';b.style.pointerEvents=on?'':'none';};
+  if(estado==='guardando'){set(w,false);set(d,false);set(t,false);if(t){t.innerHTML='⏳ Guardando… no cierres';t.onclick=null;}}
+  else if(estado==='ok'){set(w,true);set(d,true);set(t,true);if(t){t.innerHTML='&#10003; Terminar';t.onclick=terminarYRegresar;}}
+  else{set(w,true);set(d,true);set(t,true);if(t){t.innerHTML='↻ Reintentar guardar';t.onclick=_reintentarGuardar;}}
+}
+function _lanzarSubida(){
+  if(!_ultimoPdf)return;
+  _guardadoOK=false;_botonesModal('guardando');
+  _subidaPromesa=subirASeguimientos(_ultimoPdf.blob,_ultimoPdf.fname).then(()=>_botonesModal(_guardadoOK?'ok':'error'),()=>_botonesModal('error'));
+}
+function _reintentarGuardar(){_lanzarSubida();}
 function regresarApp(){
+  if(!_guardadoOK&&!confirm('¿Salir sin guardar?\n\nLo que llenaste y la firma del cliente se pierden.'))return;
   const v=_urlVolver();
   if(v){location.href=v;return;}
   if(history.length>1)history.back();
@@ -875,7 +895,7 @@ async function terminarYRegresar(){
   if(_subidaPromesa){if(b){b.disabled=true;b.textContent='⏳ Guardando…';}try{await _subidaPromesa;}catch(e){}}
   const v=_urlVolver();
   if(v&&_guardadoOK){location.href=v+(v.indexOf('?')>=0?'&':'?')+'firmado=1';return;}
-  if(v){location.href=v;return;}
+  if(v&&!_guardadoOK){alert('Todavía NO se guardó la entrega. Toca "Reintentar guardar" antes de salir para no perder la firma.');_botonesModal('error');return;}
   document.getElementById('modal').classList.remove('show');
   if(b){b.disabled=false;b.innerHTML='&#10003; Terminar';}
 }
@@ -1102,8 +1122,8 @@ function generarPDF(){
   }
   document.getElementById('modal').classList.add('show');
   // Subida AUTOMÁTICA a Seguimientos (ISA-OS)
-  _guardadoOK=false;
-  _subidaPromesa=subirASeguimientos(blob,fname);
+  _ultimoPdf={blob,fname};
+  _lanzarSubida();
 }
 
 // SUPABASE - subida automática a ISA-OS
