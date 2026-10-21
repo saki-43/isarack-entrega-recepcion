@@ -552,6 +552,10 @@ function getPersonal(){
 
 // RENDER REVISIONES
 const RC=document.getElementById('revs');
+// Dias trabajados: UNA vez para todo el proyecto (antes iban en cada revision y el
+// PDF salia con 6 puntos por dia). En el PDF las columnas de dias son una sola celda.
+RC.innerHTML+=`<div class="rev-item"><div class="drow" style="padding:4px 2px"><span>Días trabajados:</span>
+  <div class="dg">${DIAS.map((d,j)=>`<input class="di" type="checkbox" id="dia_${j}"><label class="dl" for="dia_${j}">${d}</label>`).join('')}</div></div></div>`;
 REVS.forEach(({p,c},i)=>{
   const n=i+1;
   RC.innerHTML+=`<div class="rev-item">
@@ -567,9 +571,6 @@ REVS.forEach(({p,c},i)=>{
         <input class="cno" type="radio" name="r${n}" id="no${n}" value="no">
         <label for="no${n}">✗ NO CUMPLE</label>
       </div>
-    </div>
-    <div class="drow"><span>Días:</span>
-      <div class="dg">${DIAS.map((d,j)=>`<input class="di" type="checkbox" id="d${n}_${j}"><label class="dl" for="d${n}_${j}">${d}</label>`).join('')}</div>
     </div>
     <input class="obs-in" type="text" id="obs${n}" placeholder="Observaciones...">
   </div></div>`;
@@ -927,7 +928,7 @@ async function precargarDesdeObra(){
         const d=new Date(lun);d.setDate(lun.getDate()+j);
         const iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
         const x=asis[iso];if(!x||!Object.values(x).some(v=>Number(v)>0))continue;
-        for(let n=1;n<=REVS.length;n++){const c=document.getElementById(`d${n}_${j}`);if(c)c.checked=true;}
+        const c=document.getElementById(`dia_${j}`);if(c)c.checked=true;
         marcados++;
       }
       if(marcados)hechos.push('días');
@@ -1097,10 +1098,11 @@ function generarPDF(){
     ['LUN','MAR','MIÉ','JUE','VIE','SÁB'].forEach((d,i)=>doc.text(d,XLUN+i*CDIA+CDIA/2,y+7.5,{align:'center'}));
     y+=11;
 
+    const YD0=y;
     for(let i=1;i<=6;i++){
       doc.setFillColor(...(i%2?WH:LG));doc.rect(ML,y,UW,RH,'F');
       doc.setDrawColor(...MG);doc.setLineWidth(0.3);doc.rect(ML,y,UW,RH);
-      [XPT,XCR,XCMP,XNCMP,XLUN,...[1,2,3,4,5,6].map(k=>XLUN+k*CDIA),XOBS].forEach(vx=>doc.line(vx,y,vx,y+RH));
+      [XPT,XCR,XCMP,XNCMP,XLUN,XOBS].forEach(vx=>doc.line(vx,y,vx,y+RH));
       doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...OR);
       doc.text(String(i),ML+CP/2,y+RH/2+4,{align:'center'});
       doc.setFontSize(7);doc.setTextColor(...DK);
@@ -1111,11 +1113,18 @@ function generarPDF(){
       if(sel?.value==='si'){doc.setTextColor(34,197,94);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('SI',XCMP+CCMP/2,y+RH/2+4,{align:'center'});}
       else if(sel?.value==='no'){doc.setTextColor(239,68,68);doc.setFont('helvetica','bold');doc.setFontSize(14);doc.text('NO',XNCMP+CNCMP/2,y+RH/2+4,{align:'center'});}
       doc.setTextColor(...OR);doc.setFont('helvetica','bold');doc.setFontSize(10);
-      for(let j=0;j<6;j++){if(document.getElementById(`d${i}_${j}`)?.checked)doc.circle(XLUN+j*CDIA+CDIA/2,y+RH/2,2.2,'F');} // circulo dibujado: la fuente del PDF no trae '●' (salia '%Ï')
       const obs=gv(`obs${i}`);
       if(obs){doc.setTextColor(...DK);doc.setFont('helvetica','normal');doc.setFontSize(6.5);doc.text(obs,XOBS+3,y+RH/2+2,{maxWidth:COBS-6});}
       doc.setTextColor(...DK);y+=RH;
     }
+    // Duracion del proyecto: una sola celda alta para las 6 revisiones, un punto por dia
+    // (circulo dibujado: la fuente del PDF no trae '●' y salia '%Ï').
+    doc.setFillColor(...WH);doc.rect(XLUN+0.2,YD0+0.2,CDIA*6-0.4,y-YD0-0.4,'F');
+    doc.setDrawColor(...MG);doc.setLineWidth(0.3);
+    for(let k=0;k<=6;k++)doc.line(XLUN+k*CDIA,YD0,XLUN+k*CDIA,y);
+    doc.line(XLUN,y,XOBS,y);
+    doc.setFillColor(...OR);
+    for(let j=0;j<6;j++){if(document.getElementById(`dia_${j}`)?.checked)doc.circle(XLUN+j*CDIA+CDIA/2,(YD0+y)/2,4,'F');}
   }
   y+=6;
 
