@@ -894,12 +894,13 @@ async function precargarDesdeObra(){
       const sis=(o&&Array.isArray(o.sistemas)&&o.sistemas[0])||_sistemaDeLineas(o&&o.cotData&&o.cotData.lineas);
       if(sis){const sel=document.getElementById('tipo');for(const op of sel.options){if(_norm(op.value)===_norm(sis)){sel.value=op.value;hechos.push('sistema');break;}}}
     }
-    // Obra: el mejor registro del folio (no terminado, con gente/asistencia, mas reciente)
+    // Obra: el mejor registro del folio (con gente/asistencia, no terminado, mas reciente)
     const {data:rows}=await sb.from('instalaciones_activas').select('*').eq('folio',folio);
     const pts=r=>((r.instaladores||[]).length)+Object.keys(r.asistencia||{}).length;
     const r=(rows||[]).slice().sort((a,b)=>{
       const fa=/termin|complet/i.test(a.estatus||'')?1:0,fb=/termin|complet/i.test(b.estatus||'')?1:0;
-      return fa-fb||(pts(b)>0)-(pts(a)>0)||String(b.updated_at||'').localeCompare(String(a.updated_at||''));
+      // con datos primero (una obra Terminada con gente gana a un registro vacio)
+      return (pts(b)>0)-(pts(a)>0)||fa-fb||String(b.updated_at||'').localeCompare(String(a.updated_at||''));
     })[0];
     if(!r)return;
     if(r.lider){
