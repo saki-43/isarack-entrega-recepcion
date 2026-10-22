@@ -116,6 +116,16 @@ body{font-family:'Barlow',sans-serif;background:#EFEFED;color:var(--dk);min-heig
 .tg .csi:checked+label{background:var(--gn);color:#fff;}
 .tg .cno:checked+label{background:var(--rd);color:#fff;}
 .drow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.cal-d{max-width:320px}
+.cal-h{display:flex;align-items:center;justify-content:space-between;margin:2px 0 6px;font-size:13px}
+.cal-h b{text-transform:capitalize}
+.cal-h button{border:1px solid #ddd;background:#fff;border-radius:8px;width:32px;height:28px;font-size:16px;cursor:pointer}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cal-g .w{font-size:10px;font-weight:700;color:#888;padding:2px 0}
+.cal-g button{border:none;background:none;height:34px;border-radius:50%;font-size:13px;color:#333;cursor:pointer}
+.cal-g button.fuera{color:#c8c8c8}
+.cal-g button.on{background:var(--or);color:#fff;font-weight:700}
+.cal-hint{font-size:11px;color:#888;margin-top:4px}
 .drow span{font-size:11px;font-weight:600;color:var(--md);}
 .dg{display:flex;gap:4px;}
 .di{display:none;}
@@ -437,6 +447,23 @@ const REVS=[
   {p:'Limpieza',      c:'Se debe aspirar todo el polvo y apilar la basura en sus contenedores.'},
 ];
 const DIAS=['LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+// Dias trabajados como calendario del mes (22 oct 2026, Isaac): fechas reales, no
+// solo dia de la semana. DIAS_TRAB = fechas 'YYYY-MM-DD'; CAL_MES = mes que se ve.
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+let DIAS_TRAB=new Set(),CAL_MES=null;
+const _isoD=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+// 6 semanas (42 dias) empezando en lunes, que cubren el mes 'YYYY-MM'
+function _semanasMes(ym){const [a,m]=ym.split('-').map(Number);const p=new Date(a,m-1,1,12);const ini=new Date(p);ini.setDate(1-((p.getDay()+6)%7));
+  return Array.from({length:42},(_,k)=>{const d=new Date(ini);d.setDate(ini.getDate()+k);return d;});}
+function renderCal(){
+  const g=document.getElementById('cal-grid'),t=document.getElementById('cal-tit');if(!g)return;
+  if(!CAL_MES)CAL_MES=(gv('fecha')||_isoD(new Date())).slice(0,7);
+  const [a,m]=CAL_MES.split('-').map(Number);if(t)t.textContent=MESES[m-1]+' '+a;
+  g.innerHTML=['L','M','M','J','V','S','D'].map(l=>`<div class="w">${l}</div>`).join('')+
+    _semanasMes(CAL_MES).map(d=>{const iso=_isoD(d);return `<button type="button" class="${d.getMonth()+1!==m?'fuera ':''}${DIAS_TRAB.has(iso)?'on':''}" onclick="calToggle('${iso}')">${d.getDate()}</button>`;}).join('');
+}
+function calToggle(iso){if(DIAS_TRAB.has(iso))DIAS_TRAB.delete(iso);else DIAS_TRAB.add(iso);renderCal();}
+function calMover(n){const [a,m]=(CAL_MES||_isoD(new Date()).slice(0,7)).split('-').map(Number);const d=new Date(a,m-1+n,1,12);CAL_MES=_isoD(d).slice(0,7);renderCal();}
 let entResp=null;
 
 // TIPO SERVICIO
@@ -554,8 +581,9 @@ function getPersonal(){
 const RC=document.getElementById('revs');
 // Dias trabajados: UNA vez para todo el proyecto (antes iban en cada revision y el
 // PDF salia con 6 puntos por dia). En el PDF las columnas de dias son una sola celda.
-RC.innerHTML+=`<div class="rev-item"><div class="drow" style="padding:4px 2px"><span>Días trabajados:</span>
-  <div class="dg">${DIAS.map((d,j)=>`<input class="di" type="checkbox" id="dia_${j}"><label class="dl" for="dia_${j}">${d}</label>`).join('')}</div></div></div>`;
+RC.innerHTML+=`<div class="rev-item"><div class="cal-d"><div style="font-size:11px;font-weight:600;color:var(--md);margin-bottom:2px">Días trabajados</div>
+  <div class="cal-h"><button type="button" onclick="calMover(-1)">‹</button><b id="cal-tit"></b><button type="button" onclick="calMover(1)">›</button></div>
+  <div class="cal-g" id="cal-grid"></div><div class="cal-hint">Toca las fechas que se trabajó.</div></div></div>`;
 REVS.forEach(({p,c},i)=>{
   const n=i+1;
   RC.innerHTML+=`<div class="rev-item">
@@ -851,6 +879,7 @@ window.addEventListener('load',()=>{
   document.getElementById('fecha').value=new Date().toISOString().split('T')[0];
   // Auto-llenado desde URL (si viene de la PWA)
   precargarDesdeURL();
+  renderCal();
   precargarDesdeObra();
 });
 
@@ -918,20 +947,11 @@ async function precargarDesdeObra(){
       lista.forEach(n=>{const i=_idxPersona(n);if(i>=0)personalSel.add(i);});
       if(lista.length){renderChips();hechos.push('personal');}
     }
-    // Dias: los de la semana de la fecha del formato con alguien presente
-    const algunDia=[...document.querySelectorAll('.di')].some(c=>c.checked);
-    const f=gv('fecha');
-    if(!algunDia&&f){
-      const base=new Date(f+'T12:00:00');const lun=new Date(base);lun.setDate(base.getDate()-((base.getDay()+6)%7));
-      let marcados=0;
-      for(let j=0;j<6;j++){
-        const d=new Date(lun);d.setDate(lun.getDate()+j);
-        const iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-        const x=asis[iso];if(!x||!Object.values(x).some(v=>Number(v)>0))continue;
-        const c=document.getElementById(`dia_${j}`);if(c)c.checked=true;
-        marcados++;
-      }
-      if(marcados)hechos.push('días');
+    // Dias: todas las fechas de la obra con alguien presente; el calendario abre en el
+    // mes del primer dia trabajado.
+    if(!DIAS_TRAB.size){
+      const fechas=Object.keys(asis).filter(d=>/^\d{4}-\d\d-\d\d$/.test(d)&&Object.values(asis[d]||{}).some(v=>Number(v)>0)).sort();
+      if(fechas.length){fechas.forEach(d=>DIAS_TRAB.add(d));CAL_MES=fechas[0].slice(0,7);renderCal();hechos.push('días');}
     }
     if(hechos.length)console.log('[Precarga obra]',folio,hechos.join(', '));
   }catch(e){console.warn('precargarDesdeObra',e);}
@@ -1095,7 +1115,8 @@ function generarPDF(){
     doc.setFillColor(228,228,228);doc.rect(ML,y,UW,11,'F');
     doc.setDrawColor(...MG);doc.setLineWidth(0.3);doc.rect(ML,y,UW,11);
     doc.setFont('helvetica','bold');doc.setFontSize(6.5);doc.setTextColor(...DK);
-    ['LUN','MAR','MIÉ','JUE','VIE','SÁB'].forEach((d,i)=>doc.text(d,XLUN+i*CDIA+CDIA/2,y+7.5,{align:'center'}));
+    const _calMes=CAL_MES||(gv('fecha')||_isoD(new Date())).slice(0,7);
+    {const [ca,cm]=_calMes.split('-').map(Number);doc.text((MESES[cm-1]+' '+ca).toUpperCase(),XLUN+CDIA*3,y+7.5,{align:'center'});}
     y+=11;
 
     const YD0=y;
@@ -1121,10 +1142,18 @@ function generarPDF(){
     // (circulo dibujado: la fuente del PDF no trae '●' y salia '%Ï').
     doc.setFillColor(...WH);doc.rect(XLUN+0.2,YD0+0.2,CDIA*6-0.4,y-YD0-0.4,'F');
     doc.setDrawColor(...MG);doc.setLineWidth(0.3);
-    for(let k=0;k<=6;k++)doc.line(XLUN+k*CDIA,YD0,XLUN+k*CDIA,y);
+    doc.line(XLUN,YD0,XLUN,y);doc.line(XOBS,YD0,XOBS,y);
     doc.line(XLUN,y,XOBS,y);
-    doc.setFillColor(...OR);
-    for(let j=0;j<6;j++){if(document.getElementById(`dia_${j}`)?.checked)doc.circle(XLUN+j*CDIA+CDIA/2,(YD0+y)/2,4,'F');}
+    // Calendario del mes (lunes primero); dias trabajados en circulo naranja con la fecha
+    {const cw=CDIA*6/7,top=YD0+18,rh=(y-4-top)/6,cm=Number(_calMes.split('-')[1]);
+     doc.setFont('helvetica','bold');doc.setFontSize(6.5);doc.setTextColor(115,115,115);
+     ['L','M','M','J','V','S','D'].forEach((l,i)=>doc.text(l,XLUN+cw*i+cw/2,YD0+12,{align:'center'}));
+     _semanasMes(_calMes).forEach((d,k)=>{
+       const cx=XLUN+cw*(k%7)+cw/2,cy=top+rh*Math.floor(k/7)+rh/2,iso=_isoD(d);
+       if(DIAS_TRAB.has(iso)){doc.setFillColor(...OR);doc.circle(cx,cy,8.6,'F');doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(255,255,255);doc.text(String(d.getDate()),cx,cy+2.6,{align:'center'});}
+       else{doc.setFont('helvetica','normal');doc.setFontSize(7);const c=d.getMonth()+1===cm?64:199;doc.setTextColor(c,c,c);doc.text(String(d.getDate()),cx,cy+2.4,{align:'center'});}
+     });
+     doc.setTextColor(...DK);}
   }
   y+=6;
 
