@@ -1052,27 +1052,22 @@ function generarPDF(){
   dc('SISTEMA:',gv('tipo'),ML,MID-6,y);dc('SUPERVISOR:',gv('supervisor'),MID+4,ML+UW,y);y+=16;
   dc('ALCANCE:',gv('alcance'),ML,MID-6,y);dc('EJECUTIVO:',gv('ejecutivo'),MID+4,ML+UW,y);y+=20;
 
-  // PERSONAL PARTICIPANTE
-  const personal=getPersonal();
+  // PERSONAL PARTICIPANTE: recuadro con 3 columnas, en orden alfabetico de arriba a abajo
+  const personal=getPersonal().slice().sort((a,b)=>a.name.localeCompare(b.name,'es'));
   if(personal.length>0){
     doc.setFillColor(...DK);doc.rect(ML,y,UW,13,'F');
     doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...WH);
     doc.text('PERSONAL PARTICIPANTE',ML+UW/2,y+9,{align:'center'});
     y+=13;
-    const rows=Math.ceil(personal.length/2);
-    doc.setFillColor(...LG);doc.rect(ML,y,UW,rows*14+8,'F');
-    doc.setDrawColor(...MG);doc.setLineWidth(0.3);doc.rect(ML,y,UW,rows*14+8);
-    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...DK);
-    y+=10;
-    for(let i=0;i<personal.length;i++){
-      const col=i%2,row=Math.floor(i/2);
-      const px=ML+10+col*(UW/2);
-      const py=y+row*14;
-      const prefix=personal[i].op?'⛑ ':'• ';
-      doc.text(prefix+personal[i].name,px,py,{maxWidth:UW/2-15});
-    }
-    y+=rows*14+6;
-    y+=6;
+    const COLS=3,LH=10.5,rows=Math.ceil(personal.length/COLS),alto=rows*LH+4.5;
+    doc.setFillColor(...LG);doc.rect(ML,y,UW,alto,'F');
+    doc.setDrawColor(...MG);doc.setLineWidth(0.3);doc.rect(ML,y,UW,alto);
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(...DK);
+    personal.forEach((p,i)=>{
+      const col=Math.floor(i/rows),row=i%rows;
+      doc.text('· '+p.name,ML+10+col*(UW/COLS),y+10+row*LH,{maxWidth:UW/COLS-14});
+    });
+    y+=alto+14;
   }
 
   // REVISIONES / ENTREGA
